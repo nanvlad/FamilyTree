@@ -9,12 +9,12 @@ namespace Family
             CheckMariage(who);
             CheckMariage(with);
             (who.Spouse, with.Spouse) = (with, who);
-            
+
             static void CheckMariage(Person person)
             {
                 if(person.IsMarried)
                 {
-                    throw new InvalidOperationException($"{person.FullName} is already married!");   
+                    throw new InvalidOperationException($"{person.FullName} is already married with {person.Spouse.FullName}!");   
                 }
             } 
         }

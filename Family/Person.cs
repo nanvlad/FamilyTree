@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Family
 {
-    public abstract class Person
+    public abstract class Person : IEquatable<Person>
     {
         private DateTime? _deathday;
 
@@ -46,6 +46,20 @@ namespace Family
         public string FullName => FirstName + " " + LastName;
 
         public bool IsMarried => Spouse != null;
+
+        public bool Equals(Person other)
+            => (this?.FullName, this?.Birthday) == (other?.FullName, other?.Birthday);
+
+        public override bool Equals(object obj)
+            => Equals(obj as Person);
+
+        public override int GetHashCode() 
+            => (this?.FullName, this?.Birthday).GetHashCode();
+
+        // public void DeConstruct(out string firstName, out string lastName, out DateTime birthday)
+        // {this
+        //     (firstName, lastName, birthday) = (FirstName, LastName, Birthday);
+        // }
     }
 
     public class Man : Person
