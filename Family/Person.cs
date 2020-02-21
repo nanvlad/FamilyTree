@@ -6,56 +6,57 @@ namespace Family
 {
     public abstract class Person
     {
-        private readonly DateTime _birthday;
         private DateTime? _deathday;
-        private List<Person> _children = new List<Person>();
-        private List<Person> _siblings = new List<Person>();
 
-        public Person(DateTime birth, IEnumerable<Person> parents)
+        public string FirstName { get; private set; }
+
+        public string LastName { get; private set; }
+
+        public DateTime Birthday { get; }
+
+        public Person Spouse { get; set; }
+
+        private readonly List<Person> _parents = new List<Person>();
+
+        private readonly List<Person> _children = new List<Person>();
+        
+        private readonly List<Person> _siblings = new List<Person>();
+
+        public Person(string firstName, string lastName, DateTime birthday)
         {
-            _birthday = birth;
-            Parents = parents.ToArray();
-            UpdateSiblingsRelations();
+            FirstName = firstName;
+            LastName = lastName;
+            Birthday = birthday;
         }
 
-        public IReadOnlyList<Person> Parents { get; } = Array.Empty<Person>();
+        // public IReadOnlyList<Person> Parents { get; } = Array.Empty<Person>();
 
-        public IReadOnlyList<Person> Children => _children.ToArray();
+        // public IReadOnlyList<Person> Children => _children.ToArray();
 
-        public IReadOnlyList<Person> Siblings => _siblings.ToArray();
+        // public IReadOnlyList<Person> Siblings => _siblings.ToArray();
 
-        public bool IsDead => _deathday.HasValue;
+        public bool HasGone => _deathday.HasValue;
 
-        public int Age => (int)((DateTime.Today - _birthday).TotalDays / 365);
+        public int Age => (int)((DateTime.Today - Birthday).TotalDays / 365);
 
-        public bool IsOrphan => Age < 18 && Parents.All(p => p.IsDead);
+        public bool IsOrphan => !IsAdult && _parents.All(p => p.HasGone);
 
-        private void UpdateSiblingsRelations()
-        {
-            foreach (var parent in Parents)
-            {
-                foreach (var child in parent._children)
-                {
-                    if (!child._siblings.Contains(this))
-                    {
-                        child._siblings.Add(this);
-                    }
+        public bool IsAdult => Age >= 18;
 
-                    _siblings.Add(child);
-                }
+        public string FullName => FirstName + " " + LastName;
 
-                parent._children.Add(this);
-            }
-        }
+        public bool IsMarried => Spouse != null;
     }
 
     public class Man : Person
     {
-        public Man(DateTime birth, IEnumerable<Person> parents) : base(birth, parents) { }
+        public Man(string firstName, string lastName, DateTime birthday) 
+            : base(firstName, lastName, birthday) { }
     }
 
     public class Woman : Person
     {
-        public Woman(DateTime birth, IEnumerable<Person> parents) : base(birth, parents) { }
+        public Woman(string firstName, string lastName, DateTime birthday) 
+            : base(firstName, lastName, birthday) { }
     }
 }
