@@ -6,8 +6,15 @@ namespace Family
 {
     public abstract class Person : IEquatable<Person>
     {
-        private DateTime? _deathday;
+        private readonly List<Person> _parents = new List<Person>();
+        private readonly List<Person> _children = new List<Person>();
 
+        public Person(string firstName, string lastName, DateTime birthday, IEnumerable<Person> parents)
+        {
+            (FirstName, LastName, Birthday) = (firstName, lastName, birthday);
+            AddParentsWithChildren(parents);
+        }
+        
         public string FirstName { get; private set; }
 
         public string LastName { get; private set; }
@@ -16,26 +23,13 @@ namespace Family
 
         public Person Spouse { get; set; }
 
-        private readonly List<Person> _parents = new List<Person>();
+        public DateTime? DeathDate{ get; private set; }
 
-        private readonly List<Person> _children = new List<Person>();
-        
-        private readonly List<Person> _siblings = new List<Person>();
+        public IReadOnlyList<Person> Parents => _parents.ToArray();
 
-        public Person(string firstName, string lastName, DateTime birthday)
-        {
-            FirstName = firstName;
-            LastName = lastName;
-            Birthday = birthday;
-        }
+        public IReadOnlyList<Person> Children => _children.ToArray();
 
-        // public IReadOnlyList<Person> Parents { get; } = Array.Empty<Person>();
-
-        // public IReadOnlyList<Person> Children => _children.ToArray();
-
-        // public IReadOnlyList<Person> Siblings => _siblings.ToArray();
-
-        public bool HasGone => _deathday.HasValue;
+        public bool HasGone => DeathDate.HasValue;
 
         public int Age => (int)((DateTime.Today - Birthday).TotalDays / 365);
 
@@ -47,6 +41,8 @@ namespace Family
 
         public bool IsMarried => Spouse != null;
 
+        public void SetDeath(DateTime date) => DeathDate = date;
+
         public bool Equals(Person other)
             => (this?.FullName, this?.Birthday) == (other?.FullName, other?.Birthday);
 
@@ -56,21 +52,24 @@ namespace Family
         public override int GetHashCode() 
             => (this?.FullName, this?.Birthday).GetHashCode();
 
-        // public void DeConstruct(out string firstName, out string lastName, out DateTime birthday)
-        // {this
-        //     (firstName, lastName, birthday) = (FirstName, LastName, Birthday);
-        // }
-    }
+        private void AddParentsWithChildren(IEnumerable<Person> parents)
+        {
+            if(parents != null)
+            {
+                foreach(var parent in parents)
+                {
+                    AddChild(parent);
+                    _parents.Add(parent);
+                }
+            }
 
-    public class Man : Person
-    {
-        public Man(string firstName, string lastName, DateTime birthday) 
-            : base(firstName, lastName, birthday) { }
-    }
-
-    public class Woman : Person
-    {
-        public Woman(string firstName, string lastName, DateTime birthday) 
-            : base(firstName, lastName, birthday) { }
+            void AddChild(Person parent)
+            {
+                if(!parent._children.Contains(this))
+                {
+                    parent._children.Add(this);
+                }
+            }
+        }
     }
 }

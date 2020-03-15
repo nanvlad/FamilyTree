@@ -23,7 +23,11 @@ namespace FamilyTest
 
         [Fact]
         public void IsOrphan() 
-            => (_ivan.IsOrphan, _maria.IsOrphan).Should().Be((false, true));
+        {
+            var childWithNoParents = PersonData.GetBoy(parents: null);
+            childWithNoParents.IsOrphan.Should().BeTrue();
+            _ivan.IsOrphan.Should().BeFalse();
+        }   
         
         [Fact]
         public void IsEqual()

@@ -1,9 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Family
 {
     public class PeopleService : IPeopleService
     {
+        public T Register<T>(string firstName, string lastName, DateTime birthday, IEnumerable<Person> parents) where T : Person
+        {
+            var person = Activator.CreateInstance(typeof(T), firstName, lastName, birthday, parents);
+            return person as T;
+        }
+     
         public void Marry(Person who, Person with)
         {
             CheckMariage(who);
@@ -19,28 +26,9 @@ namespace Family
             } 
         }
 
-        public T Register<T>(string firstName, string lastName, DateTime? birthday) where T : Person
+        public void PassAway(Person person, DateTime date)
         {
-            var person = Activator.CreateInstance(typeof(T), firstName, lastName, birthday);
-            return person as T;
+            person.SetDeath(date);
         }
-        
-        // private static void UpdateSiblingsRelations()
-        // {
-        //     foreach (var parent in Parents)
-        //     {
-        //         foreach (var child in parent._children)
-        //         {
-        //             if (!child._siblings.Contains(this))
-        //             {
-        //                 child._siblings.Add(this);
-        //             }
-
-        //             _siblings.Add(child);
-        //         }
-
-        //         parent._children.Add(this);
-        //     }
-        // }
     }
 }
